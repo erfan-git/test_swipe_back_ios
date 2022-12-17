@@ -1,4 +1,5 @@
 import 'package:cupertino_back_gesture/cupertino_back_gesture.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
@@ -20,12 +21,12 @@ class MyApp extends StatelessWidget {
         title: 'Swipe back ios',
         theme: ThemeData(
           primarySwatch: Colors.blue,
-          // pageTransitionsTheme: const PageTransitionsTheme(
-          //   builders: {
-          //     TargetPlatform.android: FadeUpwardsPageTransitionsBuilder(),
-          //     TargetPlatform.iOS: CupertinoPageTransitionsBuilderCustomBackGestureWidth(),
-          //   },
-          // )
+          pageTransitionsTheme: const PageTransitionsTheme(
+            builders: {
+              TargetPlatform.android: FadeUpwardsPageTransitionsBuilder(),
+              TargetPlatform.iOS: CupertinoPageTransitionsBuilder(),
+            },
+          ),
         ),
         // home: const MyHomePage(title: 'Flutter Demo Home Page'),
       ),
@@ -34,6 +35,23 @@ class MyApp extends StatelessWidget {
 }
 
 final _router = GoRouter(
+  debugLogDiagnostics: kDebugMode,
+  urlPathStrategy: UrlPathStrategy.path,
+  navigatorBuilder: (context, state, child) {
+    if (!kIsWeb) return child;
+    return Navigator(
+      pages: [
+        MaterialPage(
+          child: Column(
+            children: [
+              AppBar(),
+              Expanded(child: child),
+            ],
+          ),
+        ),
+      ],
+    );
+  },
   routes: [
     GoRoute(
       path: '/',
@@ -50,6 +68,13 @@ final _router = GoRouter(
       builder: (context, state) => const Page3(),
     ),
   ],
+  errorBuilder: (context, state) => Material(
+    child: Center(
+      child: Container(
+        color: Colors.red,
+      ),
+    ),
+  ),
 );
 
 class Page1 extends StatefulWidget {
